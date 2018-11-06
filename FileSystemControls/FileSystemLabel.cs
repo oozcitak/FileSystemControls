@@ -96,11 +96,39 @@ namespace Manina.Windows.Forms
         }
 
         /// <summary>
-        /// Gets or sets the style of disk free space bar.
+        /// Gets or sets the background color of the drive free space bar.
         /// </summary>
-        [Category("Appearance"), DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        [Description("Gets or sets the style of disk free space bar.")]
-        public virtual FreeSpaceBarStyle BarStyle { get; private set; }
+        [Category("Appearance"), DefaultValue(typeof(Color), "230, 230, 230")]
+        [Description("Gets or sets the background color of the drive free space bar.")]
+        public Color BarBackColor { get; set; } = Color.FromArgb(230, 230, 230);
+
+        /// <summary>
+        /// Gets or sets the fill color of the drive free space bar.
+        /// </summary>
+        [Category("Appearance"), DefaultValue(typeof(Color), "38, 160, 218")]
+        [Description("Gets or sets the fill color of the drive free space bar.")]
+        public Color BarFillColor { get; set; } = Color.FromArgb(38, 160, 218);
+
+        /// <summary>
+        /// Gets or sets the fill color of the drive free space bar when the amount of free space is below the critical percentage.
+        /// </summary>
+        [Category("Appearance"), DefaultValue(typeof(Color), "218, 38, 38")]
+        [Description("Gets or sets the fill color of the drive free space bar when the amount of free space is below the critical percentage.")]
+        public Color BarCriticalFillColor { get; set; } = Color.FromArgb(218, 38, 38);
+
+        /// <summary>
+        /// Gets or sets the border color of the drive free space bar.
+        /// </summary>
+        [Category("Appearance"), DefaultValue(typeof(Color), "188, 188, 188")]
+        [Description("Gets or sets the border color of the drive free space bar.")]
+        public Color BarBorderColor { get; set; } = Color.FromArgb(188, 188, 188);
+
+        /// <summary>
+        /// Gets or sets critical percentage for drive free space.
+        /// </summary>
+        [Category("Appearance"), DefaultValue(0.9f)]
+        [Description("Gets or sets critical percentage for drive free space.")]
+        public float BarCriticalPercentage { get; set; } = 0.9f;
 
         /// <summary>
         /// Gets or sets a value indicating whether this control should redraw its surface
@@ -204,8 +232,6 @@ namespace Manina.Windows.Forms
             DoubleBuffered = true;
             path = DriveInfo.GetDrives()[0].RootDirectory.FullName;
             node = new FileSystemNode(path);
-
-            BarStyle = new FreeSpaceBarStyle();
         }
         #endregion
 
@@ -238,7 +264,7 @@ namespace Manina.Windows.Forms
         /// Paints the background of the control.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-        protected virtual void DrawBackground(FileSystemLabelDrawEventArgs e)
+        protected virtual void DrawBackground(DrawWithBoundsEventArgs e)
         {
             using (Brush back = new SolidBrush(BackColor))
             {
@@ -250,7 +276,7 @@ namespace Manina.Windows.Forms
         /// Paints the contents of the control.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-        protected virtual void DrawContents(FileSystemLabelDrawEventArgs e)
+        protected virtual void DrawContents(DrawWithBoundsEventArgs e)
         {
             // Draw the image
             if (node.Thumbnail != null)
@@ -287,7 +313,7 @@ namespace Manina.Windows.Forms
         /// Draws an error message if the path is invalid.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-        protected virtual void DrawErrorMessage(FileSystemLabelDrawEventArgs e)
+        protected virtual void DrawErrorMessage(DrawWithBoundsEventArgs e)
         {
             Rectangle bounds = e.Bounds;
             bounds.Inflate(-contentPadding.Width, -contentPadding.Height);
@@ -308,7 +334,7 @@ namespace Manina.Windows.Forms
         /// Paints the border of the control.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-        protected virtual void DrawBorder(FileSystemLabelDrawEventArgs e)
+        protected virtual void DrawBorder(DrawWithBoundsEventArgs e)
         {
             if (borderStyle == BorderStyle.FixedSingle)
             {
@@ -340,14 +366,14 @@ namespace Manina.Windows.Forms
         {
             switch (node.Type)
             {
-                case FileSystemNode.NodeType.Drive:
+                case NodeType.Drive:
                     if (node.DriveType == DriveType.Fixed || node.DriveType == DriveType.Network || node.DriveType == DriveType.Ram || node.DriveType == DriveType.Removable)
                         return 3;
                     else
                         return 1;
-                case FileSystemNode.NodeType.Directory:
+                case NodeType.Directory:
                     return 2;
-                case FileSystemNode.NodeType.File:
+                case NodeType.File:
                     return 4;
                 default:
                     return 0;
@@ -367,7 +393,7 @@ namespace Manina.Windows.Forms
                     // Display name
                     return node.DisplayName;
                 case 1:
-                    if (node.Type == FileSystemNode.NodeType.Drive)
+                    if (node.Type == NodeType.Drive)
                     {
                         // Free space indicator will be drawn in DrawLine()
                         return "";
@@ -378,7 +404,7 @@ namespace Manina.Windows.Forms
                         return node.FullName;
                     }
                 case 2:
-                    if (node.Type == FileSystemNode.NodeType.Drive)
+                    if (node.Type == NodeType.Drive)
                     {
                         // Free space text
                         return string.Format("{0} free of {1}", Utility.FormatSize(node.DriveFreeSpace), Utility.FormatSize(node.DriveSize));
@@ -406,13 +432,13 @@ namespace Manina.Windows.Forms
         /// <param name="format">The string format to use.</param>
         private void DrawLine(Graphics g, int lineIndex, RectangleF bounds, Brush brush, StringFormat format)
         {
-            if (lineIndex == 1 && node.Type == FileSystemNode.NodeType.Drive)
+            if (lineIndex == 1 && node.Type == NodeType.Drive)
             {
                 // Free space indicator
                 float percentFull = (node.DriveSize - node.DriveFreeSpace) / (float)node.DriveSize;
-                using (Brush bBarBack = new SolidBrush(BarStyle.BackColor))
-                using (Brush bBarFill = new SolidBrush(percentFull > 0.9f ? BarStyle.CriticalFillColor : BarStyle.FillColor))
-                using (Pen pBarBorder = new Pen(BarStyle.BorderColor))
+                using (Brush bBarBack = new SolidBrush(BarBackColor))
+                using (Brush bBarFill = new SolidBrush(percentFull > 0.9f ? BarCriticalFillColor : BarFillColor))
+                using (Pen pBarBorder = new Pen(BarBorderColor))
                 {
                     g.FillRectangle(bBarBack, bounds);
                     g.FillRectangle(bBarFill, new RectangleF(bounds.Left, bounds.Top, bounds.Width * percentFull, bounds.Height));
@@ -444,204 +470,13 @@ namespace Manina.Windows.Forms
 
             MeasureContents();
 
-            DrawBackground(new FileSystemLabelDrawEventArgs(e.Graphics, base.ClientRectangle));
-            DrawBorder(new FileSystemLabelDrawEventArgs(e.Graphics, base.ClientRectangle));
+            DrawBackground(new DrawWithBoundsEventArgs(e.Graphics, base.ClientRectangle));
+            DrawBorder(new DrawWithBoundsEventArgs(e.Graphics, base.ClientRectangle));
 
             if (node.IsPathValid)
-                DrawContents(new FileSystemLabelDrawEventArgs(e.Graphics, ClientRectangle));
+                DrawContents(new DrawWithBoundsEventArgs(e.Graphics, ClientRectangle));
             else
-                DrawErrorMessage(new FileSystemLabelDrawEventArgs(e.Graphics, ClientRectangle));
-        }
-        #endregion
-
-        #region FileSystemLabelDrawEventArgs
-        public class FileSystemLabelDrawEventArgs : EventArgs
-        {
-            public Graphics Graphics { get; private set; }
-            public Rectangle Bounds { get; private set; }
-
-            public FileSystemLabelDrawEventArgs(Graphics graphics, Rectangle bounds)
-            {
-                Graphics = graphics;
-                Bounds = bounds;
-            }
-        }
-        #endregion
-
-        #region FreeSpaceBarStyle
-        [TypeConverter(typeof(FreeSpaceBarStyleTypeConverter))]
-        public class FreeSpaceBarStyle
-        {
-            /// <summary>
-            /// Gets or sets the background color of the drive free space bar.
-            /// </summary>
-            [Category("Appearance"), DefaultValue(typeof(Color), "230, 230, 230")]
-            [Description("Gets or sets the background color of the drive free space bar.")]
-            public Color BackColor { get; set; } = Color.FromArgb(230, 230, 230);
-
-            /// <summary>
-            /// Gets or sets the fill color of the drive free space bar.
-            /// </summary>
-            [Category("Appearance"), DefaultValue(typeof(Color), "38, 160, 218")]
-            [Description("Gets or sets the fill color of the drive free space bar.")]
-            public Color FillColor { get; set; } = Color.FromArgb(38, 160, 218);
-
-            /// <summary>
-            /// Gets or sets the fill color of the drive free space bar when the amount of free space is below the critical percentage.
-            /// </summary>
-            [Category("Appearance"), DefaultValue(typeof(Color), "218, 38, 38")]
-            [Description("Gets or sets the fill color of the drive free space bar when the amount of free space is below the critical percentage.")]
-            public Color CriticalFillColor { get; set; } = Color.FromArgb(218, 38, 38);
-
-            /// <summary>
-            /// Gets or sets the border color of the drive free space bar.
-            /// </summary>
-            [Category("Appearance"), DefaultValue(typeof(Color), "188, 188, 188")]
-            [Description("Gets or sets the border color of the drive free space bar.")]
-            public Color BorderColor { get; set; } = Color.FromArgb(188, 188, 188);
-
-            /// <summary>
-            /// Gets or sets critical percentage for drive free space.
-            /// </summary>
-            [Category("Appearance"), DefaultValue(0.9f)]
-            [Description("Gets or sets critical percentage for drive free space.")]
-            public float CriticalPercentage { get; set; } = 0.9f;
-
-            internal FreeSpaceBarStyle()
-            {
-
-            }
-
-            internal FreeSpaceBarStyle(string definition)
-            {
-                try
-                {
-                    foreach (string line in definition.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        // Read the color setting
-                        string[] pair = line.Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries);
-                        string name = pair[0].Trim();
-                        object value = null;
-                        if (string.Compare(name, "CriticalPercentage") == 0)
-                        {
-                            value = float.Parse(pair[1].Trim());
-                        }
-                        else
-                        {
-                            value = Color.FromArgb(int.Parse(pair[1].Trim()));
-                        }
-                        PropertyInfo property = typeof(FreeSpaceBarStyle).GetProperty(name);
-                        property.SetValue(this, value, null);
-                    }
-                }
-                catch
-                {
-                    throw new ArgumentException("Invalid string format", "definition");
-                }
-            }
-
-            public override string ToString()
-            {
-                // Serialize all properties which are different from the default setting
-                List<string> lines = new List<string>();
-                foreach (PropertyInfo info in typeof(FreeSpaceBarStyle).GetProperties())
-                {
-                    if (info.PropertyType == typeof(Color))
-                    {
-                        // Get property name
-                        string name = info.Name;
-                        // Get the current value
-                        Color value = (Color)info.GetValue(this, null);
-                        // Find the default value atribute
-                        Attribute[] attributes = (Attribute[])info.GetCustomAttributes(typeof(DefaultValueAttribute), false);
-                        if (attributes.Length != 0)
-                        {
-                            // Get the default value
-                            DefaultValueAttribute attribute = (DefaultValueAttribute)attributes[0];
-                            Color defaultValue = (Color)attribute.Value;
-                            // Serialize only if colors are different
-                            if (value != defaultValue)
-                            {
-                                lines.Add(string.Format("{0} = {1}", name, value.ToArgb().ToString()));
-                            }
-                        }
-                    }
-                    else if (info.PropertyType == typeof(float))
-                    {
-                        // Get property name
-                        string name = info.Name;
-                        // Get the current value
-                        float value = (float)info.GetValue(this, null);
-                        // Find the default value atribute
-                        Attribute[] attributes = (Attribute[])info.GetCustomAttributes(typeof(DefaultValueAttribute), false);
-                        if (attributes.Length != 0)
-                        {
-                            // Get the default value
-                            DefaultValueAttribute attribute = (DefaultValueAttribute)attributes[0];
-                            float defaultValue = (float)attribute.Value;
-                            // Serialize only if colors are different
-                            if (value != defaultValue)
-                            {
-                                lines.Add(string.Format("{0} = {1}", name, value.ToString()));
-                            }
-                        }
-                    }
-                }
-
-                return string.Join("; ", lines.ToArray());
-            }
-
-            internal class FreeSpaceBarStyleTypeConverter : ExpandableObjectConverter
-            {
-                public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-                {
-                    if (destinationType == typeof(string))
-                        return true;
-                    else if (destinationType == typeof(InstanceDescriptor))
-                        return true;
-
-                    return base.CanConvertTo(context, destinationType);
-                }
-
-                public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
-                {
-                    if (sourceType == typeof(string))
-                        return true;
-
-                    return base.CanConvertFrom(context, sourceType);
-                }
-
-                public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
-                {
-                    if (value != null && value is FreeSpaceBarStyle)
-                    {
-                        FreeSpaceBarStyle style = (FreeSpaceBarStyle)value;
-
-                        if (destinationType == typeof(string))
-                        {
-                            return style.ToString();
-                        }
-                        else if (destinationType == typeof(InstanceDescriptor))
-                        {
-                            // Used by the designer serializer
-                            ConstructorInfo consInfo = typeof(FreeSpaceBarStyle).GetConstructor(new Type[] { typeof(string) });
-                            return new InstanceDescriptor(consInfo, new object[] { style.ToString() });
-                        }
-                    }
-
-                    return base.ConvertTo(context, culture, value, destinationType);
-                }
-
-                public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-                {
-                    if (value != null && value is string)
-                    {
-                        return new FreeSpaceBarStyle((string)value);
-                    }
-
-                    return base.ConvertFrom(context, culture, value);
-                }
-            }
+                DrawErrorMessage(new DrawWithBoundsEventArgs(e.Graphics, ClientRectangle));
         }
         #endregion
 

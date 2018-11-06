@@ -8,18 +8,12 @@ namespace Manina.Windows.Forms
 {
     public class FileSystemNode
     {
-        public enum NodeType
-        {
-            Drive,
-            Directory,
-            File
-        }
-
         private string path = "";
         private Size thumbnailSize = new Size(64, 64);
 
         public string Path { get => path; set { path = value; UpdateNode(); } }
         public Size ThumbnailSize { get => thumbnailSize; set { thumbnailSize = value; UpdateNode(); } }
+
         public string DisplayName { get; private set; }
         public string FullName { get; private set; }
         public Image Thumbnail { get; private set; }
@@ -41,6 +35,13 @@ namespace Manina.Windows.Forms
 
         public bool IsPathValid { get; private set; }
         public string ErrorMessage { get; private set; }
+
+        public FileSystemNode(string nodePath, Size thumbSize)
+        {
+            path = nodePath;
+            thumbnailSize = thumbSize;
+            UpdateNode();
+        }
 
         public FileSystemNode(string nodePath)
         {
@@ -70,7 +71,7 @@ namespace Manina.Windows.Forms
 
             DriveFreeSpace = 0;
             DriveSize = 0;
-            DriveType = DriveType.Unknown;
+            DriveType = DriveType.None;
             DriveFormat = "";
         }
 
@@ -135,7 +136,9 @@ namespace Manina.Windows.Forms
 
                     DriveFreeSpace = info.TotalFreeSpace;
                     DriveSize = info.TotalSize;
-                    DriveType = info.DriveType;
+                    DriveType = info.DriveType == System.IO.DriveType.CDRom ? DriveType.CDRom : info.DriveType == System.IO.DriveType.Fixed ? 
+                        DriveType.Fixed : info.DriveType == System.IO.DriveType.Network ? DriveType.Network : info.DriveType == System.IO.DriveType.Ram ? 
+                        DriveType.Ram : info.DriveType == System.IO.DriveType.Removable ? DriveType.Removable : DriveType.None;
                     DriveFormat = info.DriveFormat;
 
                     DateCreated = DateTime.MinValue;

@@ -29,15 +29,22 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.fileSystemLabel1 = new Manina.Windows.Forms.FileSystemLabel();
+            this.fileSystemLabel2 = new Manina.Windows.Forms.FileSystemLabel();
+            this.fileSystemLabel6 = new Manina.Windows.Forms.FileSystemLabel();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.fileSystemButton1 = new Manina.Windows.Forms.FileSystemButton();
             this.fileSystemButton2 = new Manina.Windows.Forms.FileSystemButton();
             this.fileSystemButton3 = new Manina.Windows.Forms.FileSystemButton();
-            this.fileSystemLabel1 = new Manina.Windows.Forms.FileSystemLabel();
-            this.fileSystemLabel2 = new Manina.Windows.Forms.FileSystemLabel();
-            this.fileSystemLabel6 = new Manina.Windows.Forms.FileSystemLabel();
+            this.driveListBox1 = new Manina.Windows.Forms.DriveListBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.ShowDrivesRemovable = new System.Windows.Forms.CheckBox();
+            this.ShowDrivesCDRom = new System.Windows.Forms.CheckBox();
+            this.ShowDrivesNetwork = new System.Windows.Forms.CheckBox();
+            this.ShowDrivesFixed = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -52,44 +59,9 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "FileSystemLabel";
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.fileSystemButton1);
-            this.groupBox2.Controls.Add(this.fileSystemButton2);
-            this.groupBox2.Controls.Add(this.fileSystemButton3);
-            this.groupBox2.Location = new System.Drawing.Point(376, 12);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(343, 299);
-            this.groupBox2.TabIndex = 2;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "FileSystemButton";
-            // 
-            // fileSystemButton1
-            // 
-            this.fileSystemButton1.Location = new System.Drawing.Point(18, 28);
-            this.fileSystemButton1.Name = "fileSystemButton1";
-            this.fileSystemButton1.Path = "c:\\";
-            this.fileSystemButton1.Size = new System.Drawing.Size(305, 82);
-            this.fileSystemButton1.TabIndex = 1;
-            // 
-            // fileSystemButton2
-            // 
-            this.fileSystemButton2.Location = new System.Drawing.Point(18, 114);
-            this.fileSystemButton2.Name = "fileSystemButton2";
-            this.fileSystemButton2.Path = "c:\\windows";
-            this.fileSystemButton2.Size = new System.Drawing.Size(305, 82);
-            this.fileSystemButton2.TabIndex = 1;
-            // 
-            // fileSystemButton3
-            // 
-            this.fileSystemButton3.Location = new System.Drawing.Point(18, 200);
-            this.fileSystemButton3.Name = "fileSystemButton3";
-            this.fileSystemButton3.Path = "c:\\windows\\explorer.exe";
-            this.fileSystemButton3.Size = new System.Drawing.Size(305, 82);
-            this.fileSystemButton3.TabIndex = 1;
-            // 
             // fileSystemLabel1
             // 
+            this.fileSystemLabel1.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.fileSystemLabel1.Location = new System.Drawing.Point(15, 28);
             this.fileSystemLabel1.Name = "fileSystemLabel1";
             this.fileSystemLabel1.Path = "c:\\";
@@ -98,6 +70,7 @@
             // 
             // fileSystemLabel2
             // 
+            this.fileSystemLabel2.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.fileSystemLabel2.Location = new System.Drawing.Point(15, 114);
             this.fileSystemLabel2.Name = "fileSystemLabel2";
             this.fileSystemLabel2.Path = "c:\\windows";
@@ -106,23 +79,145 @@
             // 
             // fileSystemLabel6
             // 
+            this.fileSystemLabel6.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.fileSystemLabel6.Location = new System.Drawing.Point(15, 200);
             this.fileSystemLabel6.Name = "fileSystemLabel6";
             this.fileSystemLabel6.Path = "c:\\windows\\explorer.exe";
             this.fileSystemLabel6.Size = new System.Drawing.Size(305, 64);
             this.fileSystemLabel6.TabIndex = 0;
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.fileSystemButton1);
+            this.groupBox2.Controls.Add(this.fileSystemButton2);
+            this.groupBox2.Controls.Add(this.fileSystemButton3);
+            this.groupBox2.Location = new System.Drawing.Point(12, 317);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(343, 299);
+            this.groupBox2.TabIndex = 2;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "FileSystemButton";
+            // 
+            // fileSystemButton1
+            // 
+            this.fileSystemButton1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.fileSystemButton1.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.fileSystemButton1.Location = new System.Drawing.Point(18, 28);
+            this.fileSystemButton1.Name = "fileSystemButton1";
+            this.fileSystemButton1.Path = "c:\\";
+            this.fileSystemButton1.Size = new System.Drawing.Size(305, 82);
+            this.fileSystemButton1.TabIndex = 1;
+            // 
+            // fileSystemButton2
+            // 
+            this.fileSystemButton2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.fileSystemButton2.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.fileSystemButton2.Location = new System.Drawing.Point(18, 114);
+            this.fileSystemButton2.Name = "fileSystemButton2";
+            this.fileSystemButton2.Path = "c:\\windows";
+            this.fileSystemButton2.Size = new System.Drawing.Size(305, 82);
+            this.fileSystemButton2.TabIndex = 1;
+            // 
+            // fileSystemButton3
+            // 
+            this.fileSystemButton3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.fileSystemButton3.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.fileSystemButton3.Location = new System.Drawing.Point(18, 200);
+            this.fileSystemButton3.Name = "fileSystemButton3";
+            this.fileSystemButton3.Path = "c:\\windows\\explorer.exe";
+            this.fileSystemButton3.Size = new System.Drawing.Size(305, 82);
+            this.fileSystemButton3.TabIndex = 1;
+            // 
+            // driveListBox1
+            // 
+            this.driveListBox1.DetailTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.driveListBox1.FormattingEnabled = true;
+            this.driveListBox1.ItemHeight = 37;
+            this.driveListBox1.Location = new System.Drawing.Point(15, 28);
+            this.driveListBox1.Name = "driveListBox1";
+            this.driveListBox1.Size = new System.Drawing.Size(305, 337);
+            this.driveListBox1.TabIndex = 3;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.ShowDrivesRemovable);
+            this.groupBox3.Controls.Add(this.ShowDrivesCDRom);
+            this.groupBox3.Controls.Add(this.ShowDrivesNetwork);
+            this.groupBox3.Controls.Add(this.ShowDrivesFixed);
+            this.groupBox3.Controls.Add(this.driveListBox1);
+            this.groupBox3.Location = new System.Drawing.Point(361, 12);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(343, 462);
+            this.groupBox3.TabIndex = 4;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "groupBox3";
+            // 
+            // ShowDrivesRemovable
+            // 
+            this.ShowDrivesRemovable.AutoSize = true;
+            this.ShowDrivesRemovable.Checked = true;
+            this.ShowDrivesRemovable.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShowDrivesRemovable.Location = new System.Drawing.Point(15, 430);
+            this.ShowDrivesRemovable.Name = "ShowDrivesRemovable";
+            this.ShowDrivesRemovable.Size = new System.Drawing.Size(80, 17);
+            this.ShowDrivesRemovable.TabIndex = 4;
+            this.ShowDrivesRemovable.Text = "Removable";
+            this.ShowDrivesRemovable.UseVisualStyleBackColor = true;
+            this.ShowDrivesRemovable.CheckedChanged += new System.EventHandler(this.ShowDrivesRemovable_CheckedChanged);
+            // 
+            // ShowDrivesCDRom
+            // 
+            this.ShowDrivesCDRom.AutoSize = true;
+            this.ShowDrivesCDRom.Checked = true;
+            this.ShowDrivesCDRom.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShowDrivesCDRom.Location = new System.Drawing.Point(137, 430);
+            this.ShowDrivesCDRom.Name = "ShowDrivesCDRom";
+            this.ShowDrivesCDRom.Size = new System.Drawing.Size(66, 17);
+            this.ShowDrivesCDRom.TabIndex = 4;
+            this.ShowDrivesCDRom.Text = "CD Rom";
+            this.ShowDrivesCDRom.UseVisualStyleBackColor = true;
+            this.ShowDrivesCDRom.CheckedChanged += new System.EventHandler(this.ShowDrivesCDRom_CheckedChanged);
+            // 
+            // ShowDrivesNetwork
+            // 
+            this.ShowDrivesNetwork.AutoSize = true;
+            this.ShowDrivesNetwork.Checked = true;
+            this.ShowDrivesNetwork.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShowDrivesNetwork.Location = new System.Drawing.Point(137, 407);
+            this.ShowDrivesNetwork.Name = "ShowDrivesNetwork";
+            this.ShowDrivesNetwork.Size = new System.Drawing.Size(66, 17);
+            this.ShowDrivesNetwork.TabIndex = 4;
+            this.ShowDrivesNetwork.Text = "Network";
+            this.ShowDrivesNetwork.UseVisualStyleBackColor = true;
+            this.ShowDrivesNetwork.CheckedChanged += new System.EventHandler(this.ShowDrivesNetwork_CheckedChanged);
+            // 
+            // ShowDrivesFixed
+            // 
+            this.ShowDrivesFixed.AutoSize = true;
+            this.ShowDrivesFixed.Checked = true;
+            this.ShowDrivesFixed.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShowDrivesFixed.Location = new System.Drawing.Point(15, 407);
+            this.ShowDrivesFixed.Name = "ShowDrivesFixed";
+            this.ShowDrivesFixed.Size = new System.Drawing.Size(51, 17);
+            this.ShowDrivesFixed.TabIndex = 4;
+            this.ShowDrivesFixed.Text = "Fixed";
+            this.ShowDrivesFixed.UseVisualStyleBackColor = true;
+            this.ShowDrivesFixed.CheckedChanged += new System.EventHandler(this.ShowDrivesFixed_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1191, 576);
+            this.ClientSize = new System.Drawing.Size(1191, 634);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Name = "MainForm";
             this.Text = "Test Form";
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -137,6 +232,12 @@
         private Manina.Windows.Forms.FileSystemButton fileSystemButton3;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
+        private Manina.Windows.Forms.DriveListBox driveListBox1;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox ShowDrivesRemovable;
+        private System.Windows.Forms.CheckBox ShowDrivesFixed;
+        private System.Windows.Forms.CheckBox ShowDrivesCDRom;
+        private System.Windows.Forms.CheckBox ShowDrivesNetwork;
     }
 }
 

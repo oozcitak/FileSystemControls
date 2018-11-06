@@ -131,7 +131,7 @@ namespace Manina.Windows.Forms
         /// Paints the background of the control.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-        protected override void DrawBackground(FileSystemLabelDrawEventArgs e)
+        protected override void DrawBackground(DrawWithBoundsEventArgs e)
         {
             using (Brush back = new SolidBrush(!Enabled ? disabledBackColor : mouseDown ? selectedBackColor : mouseOver ? hoverBackColor : BackColor))
             {
@@ -143,7 +143,7 @@ namespace Manina.Windows.Forms
         /// Paints the border of the control.
         /// </summary>
         /// <param name="e">Event arguments.</param>
-        protected override void DrawBorder(FileSystemLabelDrawEventArgs e)
+        protected override void DrawBorder(DrawWithBoundsEventArgs e)
         {
             if (mouseOver)
             {
