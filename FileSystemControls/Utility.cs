@@ -71,7 +71,7 @@ namespace Manina.Windows.Forms
                 sized /= mod;
             }
 
-            return string.Format("{0} {1}", Math.Round(sized, 2), units[i]);
+            return string.Format("{0:0.#} {1}", sized, units[i]);
         }
     }
 }

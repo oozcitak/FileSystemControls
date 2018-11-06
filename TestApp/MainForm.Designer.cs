@@ -35,6 +35,7 @@
             this.ShowDrivesCDRom = new System.Windows.Forms.CheckBox();
             this.ShowDrivesNetwork = new System.Windows.Forms.CheckBox();
             this.ShowDrivesFixed = new System.Windows.Forms.CheckBox();
+            this.driveComboBox1 = new Manina.Windows.Forms.DriveComboBox();
             this.driveListBox1 = new Manina.Windows.Forms.DriveListBox();
             this.fileSystemButton1 = new Manina.Windows.Forms.FileSystemButton();
             this.fileSystemButton2 = new Manina.Windows.Forms.FileSystemButton();
@@ -73,6 +74,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.driveComboBox1);
             this.groupBox3.Controls.Add(this.ShowDrivesRemovable);
             this.groupBox3.Controls.Add(this.ShowDrivesCDRom);
             this.groupBox3.Controls.Add(this.ShowDrivesNetwork);
@@ -83,7 +85,7 @@
             this.groupBox3.Size = new System.Drawing.Size(343, 462);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "DriveListBox";
+            this.groupBox3.Text = "DriveListBox, DriveComboBox";
             // 
             // ShowDrivesRemovable
             // 
@@ -137,14 +139,26 @@
             this.ShowDrivesFixed.UseVisualStyleBackColor = true;
             this.ShowDrivesFixed.CheckedChanged += new System.EventHandler(this.ShowDrivesFixed_CheckedChanged);
             // 
+            // driveComboBox1
+            // 
+            this.driveComboBox1.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.driveComboBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.driveComboBox1.ItemHeight = 52;
+            this.driveComboBox1.Location = new System.Drawing.Point(15, 333);
+            this.driveComboBox1.Name = "driveComboBox1";
+            this.driveComboBox1.Size = new System.Drawing.Size(305, 58);
+            this.driveComboBox1.TabIndex = 5;
+            // 
             // driveListBox1
             // 
+            this.driveListBox1.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.driveListBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.driveListBox1.FormattingEnabled = true;
             this.driveListBox1.IntegralHeight = false;
             this.driveListBox1.ItemHeight = 36;
             this.driveListBox1.Location = new System.Drawing.Point(15, 28);
             this.driveListBox1.Name = "driveListBox1";
-            this.driveListBox1.Size = new System.Drawing.Size(305, 359);
+            this.driveListBox1.Size = new System.Drawing.Size(305, 287);
             this.driveListBox1.TabIndex = 3;
             // 
             // fileSystemButton1
@@ -229,6 +243,7 @@
         private System.Windows.Forms.CheckBox ShowDrivesFixed;
         private System.Windows.Forms.CheckBox ShowDrivesCDRom;
         private System.Windows.Forms.CheckBox ShowDrivesNetwork;
+        private Manina.Windows.Forms.DriveComboBox driveComboBox1;
     }
 }
 

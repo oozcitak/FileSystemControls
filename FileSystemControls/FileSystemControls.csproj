@@ -45,6 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DrawWithBoundsEventArgs.cs" />
+    <Compile Include="DriveComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DriveListBox.cs">
       <SubType>Component</SubType>
     </Compile>
