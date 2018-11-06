@@ -131,6 +131,9 @@ namespace Manina.Windows.Forms
         #region Constructor
         public DriveListBox()
         {
+            SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.DoubleBuffer, true);
+            DoubleBuffered = true;
+
             DrawMode = DrawMode.OwnerDrawVariable;
             RefreshDriveList();
 
@@ -185,7 +188,7 @@ namespace Manina.Windows.Forms
             var node = Items[e.Index] as FileSystemNode;
             bool hovered = hoveredItemIndex == e.Index;
 
-            renderer.DrawItem(e.Graphics, e.Bounds, node,
+            renderer.DrawItem(e.Graphics, e.Bounds, node, Enabled,
                 (e.State & DrawItemState.Selected) == DrawItemState.Selected, hovered, Focused);
         }
 

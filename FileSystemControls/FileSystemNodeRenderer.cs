@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
-    internal class FileSystemNodeRenderer
+    public class FileSystemNodeRenderer
     {
         #region Events
         public class GetLineCountEventArgs : EventArgs
@@ -26,11 +27,15 @@ namespace Manina.Windows.Forms
             public FileSystemNode Node { get; private set; }
             public int LineIndex { get; private set; }
             public string Contents { get; set; }
+            public bool ShowBar { get; set; }
+            public float BarPercentage { get; set; }
+            public Color Color { get; set; }
 
-            public GetLineContentsEventArgs(FileSystemNode node, int lineIndex)
+            public GetLineContentsEventArgs(FileSystemNode node, int lineIndex, Color color)
             {
                 Node = node;
                 LineIndex = lineIndex;
+                Color = color;
                 Contents = "";
             }
         }
@@ -43,18 +48,22 @@ namespace Manina.Windows.Forms
             public Graphics Graphics { get; private set; }
             public Rectangle Bounds { get; private set; }
             public FileSystemNode Node { get; private set; }
+            public bool Enabled { get; private set; }
             public bool Selected { get; private set; }
             public bool Hovered { get; private set; }
             public bool ControlHasFocus { get; private set; }
+            public bool Handled { get; set; }
 
-            public DrawNodeEventArgs(Graphics graphics, Rectangle bounds, FileSystemNode node, bool selected, bool hovered, bool controlHasFocus)
+            public DrawNodeEventArgs(Graphics graphics, Rectangle bounds, FileSystemNode node, bool enabled, bool selected, bool hovered, bool controlHasFocus)
             {
                 Graphics = graphics;
                 Bounds = bounds;
                 Node = node;
+                Enabled = enabled;
                 Selected = selected;
                 Hovered = hovered;
                 ControlHasFocus = controlHasFocus;
+                Handled = false;
             }
         }
 
@@ -64,24 +73,13 @@ namespace Manina.Windows.Forms
         public event DrawNodeEventHandler DrawContents;
         public event DrawNodeEventHandler DrawErrorMessage;
 
-        public class DrawNodeLineEventArgs : EventArgs
+        public class DrawNodeLineEventArgs : DrawNodeEventArgs
         {
-            public Graphics Graphics { get; private set; }
-            public Rectangle Bounds { get; private set; }
-            public FileSystemNode Node { get; private set; }
-            public bool Selected { get; private set; }
-            public bool Hovered { get; private set; }
-            public bool ControlHasFocus { get; private set; }
             public int LineIndex { get; private set; }
 
-            public DrawNodeLineEventArgs(Graphics graphics, Rectangle bounds, FileSystemNode node, bool selected, bool hovered, bool controlHasFocus, int lineIndex)
+            public DrawNodeLineEventArgs(Graphics graphics, Rectangle bounds, FileSystemNode node, bool enabled, bool selected, bool hovered, bool controlHasFocus, int lineIndex)
+                : base(graphics, bounds, node, enabled, selected, hovered, controlHasFocus)
             {
-                Graphics = graphics;
-                Bounds = bounds;
-                Node = node;
-                Selected = selected;
-                Hovered = hovered;
-                ControlHasFocus = controlHasFocus;
                 LineIndex = lineIndex;
             }
         }
@@ -91,19 +89,32 @@ namespace Manina.Windows.Forms
         #endregion
 
         #region Properties
+        public BorderStyle BorderStyle { get; set; } = BorderStyle.None;
+
+        public Font Font { get; set; } = SystemFonts.DefaultFont;
         public float LineSpacing { get; set; } = 0.2f;
+
         public Color BackColor { get; set; } = Color.FromArgb(252, 255, 255);
         public Color ForeColor { get; set; } = Color.FromArgb(0, 0, 0);
+        public Color DisabledBackColor { get; set; } = Color.FromArgb(217, 217, 217);
         public Color DetailTextColor { get; set; } = Color.FromArgb(96, 96, 96);
         public Color ErrorTextColor { get; set; } = Color.FromArgb(255, 0, 0);
+
         public Size ThumbnailSize { get; set; } = new Size(32, 32);
         public int ThumbnailTextSpacing { get; set; } = 2;
         public Size ContentPadding { get; set; } = new Size(2, 2);
+
         public Color UnfocusedItemBackColor { get; set; } = Color.FromArgb(217, 217, 217);
         public Color SelectedItemBackColor { get; set; } = Color.FromArgb(204, 232, 255);
         public Color HoveredItemBackColor { get; set; } = Color.FromArgb(229, 243, 255);
+
+        public Color UnfocusedItemBorderColor { get; set; } = Color.FromArgb(153, 153, 153);
         public Color SelectedItemBorderColor { get; set; } = Color.FromArgb(153, 209, 255);
-        public Font Font { get; set; } = SystemFonts.DefaultFont;
+        public Color DisabledItemBorderColor { get; set; } = Color.FromArgb(153, 153, 153);
+
+        public Color BarBackColor { get; set; } = Color.FromArgb(230, 230, 230);
+        public Color BarFillColor { get; set; } = Color.FromArgb(38, 160, 218);
+        public Color BarBorderColor { get; set; } = Color.FromArgb(188, 188, 188);
         #endregion
 
         #region Instance Methods
@@ -123,17 +134,34 @@ namespace Manina.Windows.Forms
         }
 
         /// <summary>
+        /// Gets the minimum height of items.
+        /// </summary>
+        /// <param name="node">The node to measure.</param>
+        /// <returns>Minimum item height.</returns>
+        public int GetItemHeight(FileSystemNode node)
+        {
+            var e = new GetLineCountEventArgs(node);
+            OnGetLineCount(e);
+            int lineHeight = Font.Height;
+            float textHeight = e.LineCount * lineHeight + LineSpacing * (e.LineCount - 1) * lineHeight;
+            float maxHeight = Math.Max(textHeight, ThumbnailSize.Height);
+
+            return (int)(maxHeight + 2 * ContentPadding.Height);
+        }
+
+        /// <summary>
         /// Renders a list item.
         /// </summary>
         /// <param name="graphics">The graphics object to draw on.</param>
         /// <param name="bounds">Bounds of the item.</param>
         /// <param name="node">The node to draw.</param>
+        /// <param name="enabled">Whether the item is enabled.</param>
         /// <param name="selected">Whether the item is selected.</param>
         /// <param name="hovered">Whether the mouse cursor is over the item.</param>
         /// <param name="controlHasFocus">Whether the control has input focus.</param>
-        public void DrawItem(Graphics graphics, Rectangle bounds, FileSystemNode node, bool selected, bool hovered, bool controlHasFocus)
+        public void DrawItem(Graphics graphics, Rectangle bounds, FileSystemNode node, bool enabled, bool selected, bool hovered, bool controlHasFocus)
         {
-            DrawNodeEventArgs e = new DrawNodeEventArgs(graphics, bounds, node, selected, hovered, controlHasFocus);
+            DrawNodeEventArgs e = new DrawNodeEventArgs(graphics, bounds, node, enabled, selected, hovered, controlHasFocus);
 
             OnDrawBackground(e);
             OnDrawBorder(e);
@@ -170,7 +198,13 @@ namespace Manina.Windows.Forms
         /// <param name="e">Event arguments.</param>
         protected virtual void OnDrawBackground(DrawNodeEventArgs e)
         {
-            using (Brush back = new SolidBrush(!e.ControlHasFocus && e.Selected ? UnfocusedItemBackColor : e.Selected ? SelectedItemBackColor : e.Hovered ? HoveredItemBackColor : BackColor))
+            DrawBackground?.Invoke(this, e);
+            if (e.Handled) return;
+
+            using (Brush back = new SolidBrush(!e.Enabled ? DisabledBackColor :
+                !e.ControlHasFocus && e.Selected ? UnfocusedItemBackColor :
+                e.Selected ? SelectedItemBackColor :
+                e.Hovered ? HoveredItemBackColor : BackColor))
             {
                 e.Graphics.FillRectangle(back, e.Bounds);
             }
@@ -182,15 +216,38 @@ namespace Manina.Windows.Forms
         /// <param name="e">Event arguments.</param>
         protected virtual void OnDrawBorder(DrawNodeEventArgs e)
         {
-            if (e.Selected)
+            DrawBorder?.Invoke(this, e);
+            if (e.Handled) return;
+
+            if (!e.Enabled && e.Selected)
+            {
+                using (Pen bFocus = new Pen(DisabledItemBorderColor))
+                {
+                    e.Graphics.DrawRectangle(bFocus, e.Bounds.Left, e.Bounds.Top, e.Bounds.Width - 1, e.Bounds.Height - 1);
+                }
+            }
+            else if (!e.ControlHasFocus && e.Selected)
+            {
+                using (Pen bFocus = new Pen(UnfocusedItemBorderColor))
+                {
+                    e.Graphics.DrawRectangle(bFocus, e.Bounds.Left, e.Bounds.Top, e.Bounds.Width - 1, e.Bounds.Height - 1);
+                }
+            }
+            else if (e.Selected)
             {
                 using (Pen bFocus = new Pen(SelectedItemBorderColor))
                 {
                     e.Graphics.DrawRectangle(bFocus, e.Bounds.Left, e.Bounds.Top, e.Bounds.Width - 1, e.Bounds.Height - 1);
                 }
             }
-
-            DrawBorder?.Invoke(this, e);
+            else if (BorderStyle == BorderStyle.FixedSingle)
+            {
+                ControlPaint.DrawBorder3D(e.Graphics, e.Bounds, Border3DStyle.Flat);
+            }
+            else if (BorderStyle == BorderStyle.Fixed3D)
+            {
+                ControlPaint.DrawBorder3D(e.Graphics, e.Bounds, Border3DStyle.RaisedOuter);
+            }
         }
 
         /// <summary>
@@ -199,7 +256,10 @@ namespace Manina.Windows.Forms
         /// <param name="e">Event arguments.</param>
         protected virtual void OnDrawContents(DrawNodeEventArgs e)
         {
-            var eLines = new GetLineCountEventArgs(null);
+            DrawContents?.Invoke(this, e);
+            if (e.Handled) return;
+
+            var eLines = new GetLineCountEventArgs(e.Node);
             OnGetLineCount(eLines);
 
             int lines = eLines.LineCount;
@@ -224,7 +284,7 @@ namespace Manina.Windows.Forms
             {
                 // Draw line of text
                 DrawNodeLineEventArgs eLine = new DrawNodeLineEventArgs(e.Graphics,
-                    Utility.ToRectangle(lineBounds), e.Node, e.Selected, e.Hovered, e.ControlHasFocus, i);
+                    Utility.ToRectangle(lineBounds), e.Node, e.Enabled, e.Selected, e.Hovered, e.ControlHasFocus, i);
                 OnDrawLine(eLine);
 
                 // Offset the bounds to the next line below
@@ -238,13 +298,31 @@ namespace Manina.Windows.Forms
         /// <param name="e">Event arguments.</param>
         protected virtual void OnDrawLine(DrawNodeLineEventArgs e)
         {
-            var eContent = new GetLineContentsEventArgs(e.Node, e.LineIndex);
+            DrawLine?.Invoke(this, e);
+            if (e.Handled) return;
+
+            var eContent = new GetLineContentsEventArgs(e.Node, e.LineIndex, Color.Empty);
             OnGetLineContents(eContent);
 
-            using (Brush brush = new SolidBrush(e.LineIndex == 0 ? ForeColor : DetailTextColor))
-            using (StringFormat stringFormat = new StringFormat())
+            if (eContent.ShowBar)
             {
-                e.Graphics.DrawString(eContent.Contents, Font, brush, e.Bounds, stringFormat);
+                // Free space indicator
+                using (Brush bBarBack = new SolidBrush(BarBackColor))
+                using (Brush bBarFill = new SolidBrush(!eContent.Color.IsEmpty ? eContent.Color : BarFillColor))
+                using (Pen pBarBorder = new Pen(BarBorderColor))
+                {
+                    e.Graphics.FillRectangle(bBarBack, e.Bounds);
+                    e.Graphics.FillRectangle(bBarFill, new RectangleF(e.Bounds.Left, e.Bounds.Top, e.Bounds.Width * eContent.BarPercentage, e.Bounds.Height));
+                    e.Graphics.DrawRectangle(pBarBorder, Utility.ToRectangle(e.Bounds));
+                }
+            }
+            else
+            {
+                using (Brush brush = new SolidBrush(!eContent.Color.IsEmpty ? eContent.Color : e.LineIndex == 0 ? ForeColor : DetailTextColor))
+                using (StringFormat stringFormat = new StringFormat())
+                {
+                    e.Graphics.DrawString(eContent.Contents, Font, brush, e.Bounds, stringFormat);
+                }
             }
         }
 
@@ -254,6 +332,9 @@ namespace Manina.Windows.Forms
         /// <param name="e">Event arguments.</param>
         protected virtual void OnDrawErrorMessage(DrawNodeEventArgs e)
         {
+            DrawErrorMessage?.Invoke(this, e);
+            if (e.Handled) return;
+
             Rectangle bounds = e.Bounds;
             bounds.Inflate(-ContentPadding.Width, -ContentPadding.Height);
 
