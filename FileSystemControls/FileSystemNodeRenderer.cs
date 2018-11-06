@@ -22,6 +22,23 @@ namespace Manina.Windows.Forms
         public delegate void GetLineCountEventHandler(object sender, GetLineCountEventArgs e);
         public event GetLineCountEventHandler GetLineCount;
 
+        public class GetLineHeightEventArgs : EventArgs
+        {
+            public FileSystemNode Node { get; private set; }
+            public int LineIndex { get; private set; }
+            public float LineHeight { get; set; }
+
+            public GetLineHeightEventArgs(FileSystemNode node, int lineIndex)
+            {
+                Node = node;
+                LineIndex = lineIndex;
+                LineHeight = -1;
+            }
+        }
+
+        public delegate void GetLineHeightEventHandler(object sender, GetLineHeightEventArgs e);
+        public event GetLineHeightEventHandler GetLineHeight;
+
         public class GetLineContentsEventArgs : EventArgs
         {
             public FileSystemNode Node { get; private set; }
@@ -115,26 +132,13 @@ namespace Manina.Windows.Forms
         public Color BarBackColor { get; set; } = Color.FromArgb(230, 230, 230);
         public Color BarFillColor { get; set; } = Color.FromArgb(38, 160, 218);
         public Color BarBorderColor { get; set; } = Color.FromArgb(188, 188, 188);
+        public Color BarCriticalFillColor { get; set; } = Color.FromArgb(218, 38, 38);
+        public float BarCriticalPercentage { get; set; } = 0.9f;
         #endregion
 
         #region Instance Methods
         /// <summary>
-        /// Gets the minimum height of items.
-        /// </summary>
-        /// <returns>Minimum item height.</returns>
-        public int GetFixedItemHeight()
-        {
-            var e = new GetLineCountEventArgs(null);
-            OnGetLineCount(e);
-            int lineHeight = Font.Height;
-            float textHeight = e.LineCount * lineHeight + LineSpacing * (e.LineCount - 1) * lineHeight;
-            float maxHeight = Math.Max(textHeight, ThumbnailSize.Height);
-
-            return (int)(maxHeight + 2 * ContentPadding.Height);
-        }
-
-        /// <summary>
-        /// Gets the minimum height of items.
+        /// Gets the minimum height of an item.
         /// </summary>
         /// <param name="node">The node to measure.</param>
         /// <returns>Minimum item height.</returns>
@@ -142,11 +146,40 @@ namespace Manina.Windows.Forms
         {
             var e = new GetLineCountEventArgs(node);
             OnGetLineCount(e);
-            int lineHeight = Font.Height;
-            float textHeight = e.LineCount * lineHeight + LineSpacing * (e.LineCount - 1) * lineHeight;
+
+            float textHeight = 0;
+            for (int i = 0; i < e.LineCount; i++)
+            {
+                var eh = new GetLineHeightEventArgs(node, i);
+                textHeight += eh.LineHeight > 0 ? eh.LineHeight : Font.Height;
+            }
+
+            textHeight += (e.LineCount - 1) * Font.Height * LineSpacing;
             float maxHeight = Math.Max(textHeight, ThumbnailSize.Height);
 
             return (int)(maxHeight + 2 * ContentPadding.Height);
+        }
+
+        /// <summary>
+        /// Gets the minimum height of an item.
+        /// </summary>
+        /// <param name="node">The node to measure.</param>
+        /// <returns>Minimum item height.</returns>
+        public int GetTextHeight(FileSystemNode node)
+        {
+            var e = new GetLineCountEventArgs(node);
+            OnGetLineCount(e);
+
+            float textHeight = 0;
+            for (int i = 0; i < e.LineCount; i++)
+            {
+                var eh = new GetLineHeightEventArgs(node, i);
+                textHeight += eh.LineHeight > 0 ? eh.LineHeight : Font.Height;
+            }
+
+            textHeight += (e.LineCount - 1) * Font.Height * LineSpacing;
+
+            return (int)textHeight;
         }
 
         /// <summary>
@@ -181,6 +214,15 @@ namespace Manina.Windows.Forms
         protected virtual void OnGetLineCount(GetLineCountEventArgs e)
         {
             GetLineCount?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// Gets the line height of an item.
+        /// </summary>
+        /// <param name="e">Event arguments.</param>
+        protected virtual void OnGetLineHeight(GetLineHeightEventArgs e)
+        {
+            GetLineHeight?.Invoke(this, e);
         }
 
         /// <summary>
@@ -263,8 +305,7 @@ namespace Manina.Windows.Forms
             OnGetLineCount(eLines);
 
             int lines = eLines.LineCount;
-            int lineHeight = Font.Height;
-            float textHeight = (lines) * lineHeight + LineSpacing * (lines - 1) * lineHeight;
+            float textHeight = GetTextHeight(e.Node);
             RectangleF iconRect = new RectangleF(e.Bounds.Left + ContentPadding.Width, e.Bounds.Top + (e.Bounds.Height - ThumbnailSize.Height) / 2f,
                 ThumbnailSize.Width, ThumbnailSize.Height);
             RectangleF textRect = new RectangleF(e.Bounds.Left + ContentPadding.Width + ThumbnailSize.Width + ThumbnailTextSpacing, e.Bounds.Top + (e.Bounds.Height - textHeight) / 2f,
@@ -279,16 +320,20 @@ namespace Manina.Windows.Forms
 
             // Draw item text
             RectangleF lineBounds = textRect;
-            lineBounds.Height = lineHeight;
             for (int i = 0; i < eLines.LineCount; i++)
             {
+                var eHeight = new GetLineHeightEventArgs(e.Node, i);
+                OnGetLineHeight(eHeight);
+                float lineHeight = eHeight.LineHeight > 0 ? eHeight.LineHeight : Font.Height;
+                lineBounds.Height = lineHeight;
+
                 // Draw line of text
                 DrawNodeLineEventArgs eLine = new DrawNodeLineEventArgs(e.Graphics,
                     Utility.ToRectangle(lineBounds), e.Node, e.Enabled, e.Selected, e.Hovered, e.ControlHasFocus, i);
                 OnDrawLine(eLine);
 
                 // Offset the bounds to the next line below
-                lineBounds.Offset(0, 1.2f * lineHeight);
+                lineBounds.Offset(0, lineHeight + Font.Height * 0.2f);
             }
         }
 
@@ -308,7 +353,7 @@ namespace Manina.Windows.Forms
             {
                 // Free space indicator
                 using (Brush bBarBack = new SolidBrush(BarBackColor))
-                using (Brush bBarFill = new SolidBrush(!eContent.Color.IsEmpty ? eContent.Color : BarFillColor))
+                using (Brush bBarFill = new SolidBrush(!eContent.Color.IsEmpty ? eContent.Color : eContent.BarPercentage > BarCriticalPercentage ? BarCriticalFillColor : BarFillColor))
                 using (Pen pBarBorder = new Pen(BarBorderColor))
                 {
                     e.Graphics.FillRectangle(bBarBack, e.Bounds);
@@ -349,7 +394,6 @@ namespace Manina.Windows.Forms
                 e.Graphics.DrawString(e.Node.ErrorMessage, Font, bError, bounds, stringFormat);
             }
         }
-
         #endregion
     }
 }

@@ -83,7 +83,7 @@
             this.groupBox3.Size = new System.Drawing.Size(343, 462);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "groupBox3";
+            this.groupBox3.Text = "DriveListBox";
             // 
             // ShowDrivesRemovable
             // 
@@ -139,14 +139,12 @@
             // 
             // driveListBox1
             // 
-            this.driveListBox1.DetailTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
-            this.driveListBox1.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.driveListBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.driveListBox1.FormattingEnabled = true;
+            this.driveListBox1.IntegralHeight = false;
             this.driveListBox1.ItemHeight = 36;
             this.driveListBox1.Location = new System.Drawing.Point(15, 28);
             this.driveListBox1.Name = "driveListBox1";
-            this.driveListBox1.Size = new System.Drawing.Size(305, 328);
+            this.driveListBox1.Size = new System.Drawing.Size(305, 359);
             this.driveListBox1.TabIndex = 3;
             // 
             // fileSystemButton1

@@ -21,7 +21,7 @@ namespace Manina.Windows.Forms
         /// Gets or sets the drawing mode for the control.
         /// </summary>
         [Browsable(false), EditorBrowsable(EditorBrowsableState.Never), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public override DrawMode DrawMode { get => DrawMode.OwnerDrawFixed; set => base.DrawMode = DrawMode.OwnerDrawFixed; }
+        public override DrawMode DrawMode { get => DrawMode.OwnerDrawVariable; set => base.DrawMode = DrawMode.OwnerDrawVariable; }
 
         /// <summary>
         /// Gets or sets the drive types to show.
@@ -89,7 +89,7 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets or sets the spacing between the border of the control and its contents.
         /// </summary>
-        [Category("Appearance"), DefaultValue(typeof(Size), "2, 2")]
+        [Category("Appearance"), DefaultValue(typeof(Size), "4, 4")]
         [Description("Gets or sets the spacing between the border of the control and its contents.")]
         public Size ContentPadding { get => renderer.ContentPadding; set => renderer.ContentPadding = value; }
 
@@ -126,6 +126,20 @@ namespace Manina.Windows.Forms
         /// </summary>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new ObjectCollection Items { get => items; }
+
+        /// <summary>
+        /// Gets or sets whether drive free space text is shown.
+        /// </summary>
+        [Category("Appearance"), DefaultValue(true)]
+        [Description("Gets or sets whether drive free space text is shown.")]
+        public bool ShowFreeSpaceText { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether drive free space bar is shown.
+        /// </summary>
+        [Category("Appearance"), DefaultValue(true)]
+        [Description("Gets or sets whether drive free space bar is shown.")]
+        public bool ShowFreeSpaceBar { get; set; }
         #endregion
 
         #region Constructor
@@ -137,16 +151,15 @@ namespace Manina.Windows.Forms
             DrawMode = DrawMode.OwnerDrawVariable;
             RefreshDriveList();
 
-            renderer.GetLineCount += (sender, e) => e.LineCount = 2;
-            renderer.GetLineContents += (sender, e) =>
-            {
-                if (e.LineIndex == 0)
-                    e.Contents = e.Node.DisplayName;
-                else if (e.LineIndex == 1)
-                    e.Contents = string.Format("{0} free of {1}", Utility.FormatSize(e.Node.DriveFreeSpace), Utility.FormatSize(e.Node.DriveSize));
-            };
-        }
+            ContentPadding = new Size(4, 4);
 
+            ShowFreeSpaceText = true;
+            ShowFreeSpaceBar = true;
+
+            renderer.GetLineCount += Renderer_GetLineCount;
+            renderer.GetLineContents += Renderer_GetLineContents;
+            renderer.GetLineHeight += Renderer_GetLineHeight;
+        }
         #endregion
 
         #region Helper Methods
@@ -175,10 +188,64 @@ namespace Manina.Windows.Forms
             }
             base.SetItemsCore(items);
         }
+
+        private void Renderer_GetLineCount(object sender, FileSystemNodeRenderer.GetLineCountEventArgs e)
+        {
+            int count = 1;
+            if (e.Node.DriveType == DriveType.Fixed || e.Node.DriveType == DriveType.Network || e.Node.DriveType == DriveType.Ram || e.Node.DriveType == DriveType.Removable)
+            {
+                if (ShowFreeSpaceText) count++;
+                if (ShowFreeSpaceBar) count++;
+            }
+            e.LineCount = count;
+        }
+
+        private void Renderer_GetLineHeight(object sender, FileSystemNodeRenderer.GetLineHeightEventArgs e)
+        {
+            if (e.LineIndex == 1 && ShowFreeSpaceText && ShowFreeSpaceBar)
+                e.LineHeight = Font.Height * 0.75f;
+            else if (e.LineIndex == 1 && ShowFreeSpaceBar)
+                e.LineHeight = Font.Height * 0.75f;
+            else
+                e.LineHeight = Font.Height;
+        }
+
+        private void Renderer_GetLineContents(object sender, FileSystemNodeRenderer.GetLineContentsEventArgs e)
+        {
+            if (e.LineIndex == 0)
+            {
+                e.Contents = e.Node.DisplayName;
+            }
+            else if (e.LineIndex == 1 && ShowFreeSpaceText && ShowFreeSpaceBar)
+            {
+                e.ShowBar = true;
+                e.BarPercentage = (e.Node.DriveSize - e.Node.DriveFreeSpace) / (float)e.Node.DriveSize;
+            }
+            else if (e.LineIndex == 1 && ShowFreeSpaceText)
+            {
+                e.Contents = string.Format("{0} free of {1}", Utility.FormatSize(e.Node.DriveFreeSpace), Utility.FormatSize(e.Node.DriveSize));
+            }
+            else if (e.LineIndex == 1 && ShowFreeSpaceBar)
+            {
+                e.ShowBar = true;
+                e.BarPercentage = (e.Node.DriveSize - e.Node.DriveFreeSpace) / (float)e.Node.DriveSize;
+            }
+            else if (e.LineIndex == 2)
+            {
+                e.Contents = string.Format("{0} free of {1}", Utility.FormatSize(e.Node.DriveFreeSpace), Utility.FormatSize(e.Node.DriveSize));
+            }
+        }
         #endregion
 
         #region Overriden Methods
-        public override int ItemHeight => renderer.GetFixedItemHeight();
+        protected override void OnMeasureItem(MeasureItemEventArgs e)
+        {
+            if (e.Index < 0 || e.Index > Items.Count - 1)
+                return;
+
+            var node = Items[e.Index] as FileSystemNode;
+            e.ItemHeight = renderer.GetItemHeight(node);
+        }
 
         protected override void OnDrawItem(DrawItemEventArgs e)
         {

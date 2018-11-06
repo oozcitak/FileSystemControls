@@ -38,20 +38,6 @@ namespace Manina.Windows.Forms
         public override Color ForeColor { get => Renderer.ForeColor; set => Renderer.ForeColor = value; }
 
         /// <summary>
-        /// Gets or sets the fill color of the drive free space bar when the amount of free space is below the critical percentage.
-        /// </summary>
-        [Category("Appearance"), DefaultValue(typeof(Color), "218, 38, 38")]
-        [Description("Gets or sets the fill color of the drive free space bar when the amount of free space is below the critical percentage.")]
-        public Color BarCriticalFillColor { get; set; } = Color.FromArgb(218, 38, 38);
-
-        /// <summary>
-        /// Gets or sets critical percentage for drive free space.
-        /// </summary>
-        [Category("Appearance"), DefaultValue(0.9f)]
-        [Description("Gets or sets critical percentage for drive free space.")]
-        public float BarCriticalPercentage { get; set; } = 0.9f;
-
-        /// <summary>
         /// Gets or sets a value indicating whether this control should redraw its surface
         /// using a secondary buffer to reduce or prevent flicker.
         /// </summary>
@@ -147,8 +133,6 @@ namespace Manina.Windows.Forms
                         // Free space indicator
                         e.ShowBar = true;
                         e.BarPercentage = (e.Node.DriveSize - e.Node.DriveFreeSpace) / (float)e.Node.DriveSize;
-                        if (e.BarPercentage > BarCriticalPercentage)
-                            e.Color = BarCriticalFillColor;
                     }
                     else
                     {
