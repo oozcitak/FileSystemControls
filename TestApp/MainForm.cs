@@ -61,5 +61,21 @@ namespace TestApp
             else
                 driveComboBox1.DriveTypes &= ~Manina.Windows.Forms.DriveType.CDRom;
         }
+
+        private void driveListBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (driveListBox1.SelectedDrives.Length == 0)
+                DriveListSelection.Text = "Select drives from the list.";
+            else
+                DriveListSelection.Text = string.Join(", ", driveListBox1.SelectedDrives);
+        }
+
+        private void driveComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(driveComboBox1.SelectedDrive))
+                DriveBoxSelection.Text = "Select a drive from the list.";
+            else
+                DriveBoxSelection.Text = driveComboBox1.SelectedDrive;
+        }
     }
 }

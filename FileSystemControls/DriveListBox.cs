@@ -45,6 +45,36 @@ namespace Manina.Windows.Forms
         public override string Text { get => base.Text; set => base.Text = value; }
 
         /// <summary>
+        /// Gets the items of the listbox.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        public new ObjectCollection Items { get => items; }
+
+        /// <summary>
+        /// Gets a collection that contains the zero-based indices of selected items.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        public new SelectedIndexCollection SelectedIndices { get => base.SelectedIndices; }
+
+        /// <summary>
+        /// Gets a collection that contains the selected items.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        public new SelectedObjectCollection SelectedItems { get => base.SelectedItems; }
+
+        /// <summary>
+        /// Gets or sets the currently selected item.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        public new object SelectedItem { get => base.SelectedItem; set => base.SelectedItem = value; }
+
+        /// <summary>
+        /// Gets or sets the index of the currently selected item.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        public override int SelectedIndex { get => base.SelectedIndex; set => base.SelectedIndex = value; }
+
+        /// <summary>
         /// Gets or sets the background color for the control.
         /// </summary>
         [Category("Appearance"), DefaultValue(typeof(Color), "252, 255, 255")]
@@ -122,12 +152,6 @@ namespace Manina.Windows.Forms
         public Color SelectedItemBorderColor { get => renderer.SelectedItemBorderColor; set => renderer.SelectedItemBorderColor = value; }
 
         /// <summary>
-        /// Gets the items of the listbox.
-        /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public new ObjectCollection Items { get => items; }
-
-        /// <summary>
         /// Gets or sets whether drive free space text is shown.
         /// </summary>
         [Category("Appearance"), DefaultValue(true)]
@@ -140,6 +164,74 @@ namespace Manina.Windows.Forms
         [Category("Appearance"), DefaultValue(true)]
         [Description("Gets or sets whether drive free space bar is shown.")]
         public bool ShowFreeSpaceBar { get; set; }
+
+        /// <summary>
+        /// Gets or sets the root paths of selected drive.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string SelectedDrive
+        {
+            get
+            {
+                if (base.SelectedItem == null)
+                    return null;
+                else
+                    return (base.SelectedItem as FileSystemNode).Path;
+            }
+            set
+            {
+                base.SelectedItems.Clear();
+
+                int i = 0;
+                foreach (object item in items)
+                {
+                    if (string.Compare((item as FileSystemNode).Path, value, true) == 0)
+                    {
+                        SelectedIndices.Add(i);
+                        break;
+                    }
+                    i++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the root paths of selected drives.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string[] SelectedDrives
+        {
+            get
+            {
+                string[] drives = new string[base.SelectedItems.Count];
+
+                int i = 0;
+                foreach (object item in base.SelectedItems)
+                {
+                    drives[i] = (item as FileSystemNode).Path;
+                    i++;
+                }
+                return drives;
+            }
+            set
+            {
+                base.SelectedItems.Clear();
+
+                int i = 0;
+                foreach (object item in items)
+                {
+                    foreach (string path in value)
+                    {
+                        if (string.Compare((item as FileSystemNode).Path, path, true) == 0)
+                        {
+                            SelectedIndices.Add(i);
+                            break;
+                        }
+                    }
+                    i++;
+                }
+            }
+        }
         #endregion
 
         #region Constructor

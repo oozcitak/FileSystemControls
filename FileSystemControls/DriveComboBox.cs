@@ -133,8 +133,46 @@ namespace Manina.Windows.Forms
         /// <summary>
         /// Gets the items of the listbox.
         /// </summary>
-        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
         public new ObjectCollection Items { get => items; }
+
+        /// <summary>
+        /// Gets or sets currently selected item.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        public new object SelectedItem { get => base.SelectedItem; set => base.SelectedItem = value; }
+
+        /// <summary>
+        /// Gets or sets the index specifying the currently selected item.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), EditorBrowsable(EditorBrowsableState.Never)]
+        public override int SelectedIndex { get => base.SelectedIndex; set => base.SelectedIndex = value; }
+
+        /// <summary>
+        /// Gets or sets the root paths of selected drive.
+        /// </summary>
+        [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string SelectedDrive
+        {
+            get
+            {
+                if (base.SelectedItem == null)
+                    return null;
+                else
+                    return (base.SelectedItem as FileSystemNode).Path;
+            }
+            set
+            {
+                foreach (object item in items)
+                {
+                    if (string.Compare((item as FileSystemNode).Path, value, true) == 0)
+                    {
+                        base.SelectedItem = item;
+                        break;
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets whether drive free space text is shown.
