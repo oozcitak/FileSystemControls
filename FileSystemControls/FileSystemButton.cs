@@ -5,6 +5,7 @@ using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
+    [ToolboxBitmap(typeof(FileSystemButton))]
     public class FileSystemButton : FileSystemLabel
     {
         #region Member Variables

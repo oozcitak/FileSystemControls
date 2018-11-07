@@ -6,6 +6,7 @@ using System.Windows.Forms.Design;
 
 namespace Manina.Windows.Forms
 {
+    [ToolboxBitmap(typeof(DriveComboBox))]
     [Designer(typeof(DriveComboBoxDesigner))]
     public class DriveComboBox : ComboBox
     {

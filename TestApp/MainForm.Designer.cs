@@ -36,6 +36,7 @@
             this.ShowDrivesNetwork = new System.Windows.Forms.CheckBox();
             this.ShowDrivesFixed = new System.Windows.Forms.CheckBox();
             this.DriveListSelection = new System.Windows.Forms.Label();
+            this.DriveBoxSelection = new System.Windows.Forms.Label();
             this.driveComboBox1 = new Manina.Windows.Forms.DriveComboBox();
             this.driveListBox1 = new Manina.Windows.Forms.DriveListBox();
             this.fileSystemButton1 = new Manina.Windows.Forms.FileSystemButton();
@@ -44,7 +45,6 @@
             this.fileSystemLabel1 = new Manina.Windows.Forms.FileSystemLabel();
             this.fileSystemLabel2 = new Manina.Windows.Forms.FileSystemLabel();
             this.fileSystemLabel6 = new Manina.Windows.Forms.FileSystemLabel();
-            this.DriveBoxSelection = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -152,6 +152,15 @@
             this.DriveListSelection.TabIndex = 6;
             this.DriveListSelection.Text = "Select drives from the list.";
             // 
+            // DriveBoxSelection
+            // 
+            this.DriveBoxSelection.AutoSize = true;
+            this.DriveBoxSelection.Location = new System.Drawing.Point(15, 375);
+            this.DriveBoxSelection.Name = "DriveBoxSelection";
+            this.DriveBoxSelection.Size = new System.Drawing.Size(131, 13);
+            this.DriveBoxSelection.TabIndex = 6;
+            this.DriveBoxSelection.Text = "Select a drive from the list.";
+            // 
             // driveComboBox1
             // 
             this.driveComboBox1.ErrorTextColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
@@ -224,15 +233,6 @@
             this.fileSystemLabel6.Path = "c:\\windows\\explorer.exe";
             this.fileSystemLabel6.Size = new System.Drawing.Size(305, 68);
             this.fileSystemLabel6.TabIndex = 0;
-            // 
-            // DriveBoxSelection
-            // 
-            this.DriveBoxSelection.AutoSize = true;
-            this.DriveBoxSelection.Location = new System.Drawing.Point(15, 375);
-            this.DriveBoxSelection.Name = "DriveBoxSelection";
-            this.DriveBoxSelection.Size = new System.Drawing.Size(131, 13);
-            this.DriveBoxSelection.TabIndex = 6;
-            this.DriveBoxSelection.Text = "Select a drive from the list.";
             // 
             // MainForm
             // 

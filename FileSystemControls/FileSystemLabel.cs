@@ -7,6 +7,7 @@ using System.Windows.Forms.Design;
 
 namespace Manina.Windows.Forms
 {
+    [ToolboxBitmap(typeof(FileSystemLabel))]
     [Designer(typeof(FileSystemLabelDesigner))]
     public class FileSystemLabel : Control
     {

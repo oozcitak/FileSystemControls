@@ -98,7 +98,7 @@ namespace Manina.Windows.Forms
 
                 // Get the small icon and shell file type
                 NativeMethods.SHGFI flags = NativeMethods.SHGFI.Icon | NativeMethods.SHGFI.SmallIcon | NativeMethods.SHGFI.TypeName | NativeMethods.SHGFI.UseFileAttributes;
-                IntPtr hImg = NativeMethods.SHGetFileInfo(path, FileAttributes.Normal, out var shinfo, (uint)Marshal.SizeOf<NativeMethods.SHFILEINFO>(), flags);
+                IntPtr hImg = NativeMethods.SHGetFileInfo(path, FileAttributes.Normal, out var shinfo, (uint)Marshal.SizeOf(typeof(NativeMethods.SHFILEINFO)), flags);
 
                 // Get mime type
                 FileType = shinfo.szTypeName;
@@ -117,7 +117,7 @@ namespace Manina.Windows.Forms
 
                 // Get large icon
                 flags = NativeMethods.SHGFI.Icon | NativeMethods.SHGFI.LargeIcon | NativeMethods.SHGFI.UseFileAttributes;
-                hImg = NativeMethods.SHGetFileInfo(path, FileAttributes.Normal, out shinfo, (uint)Marshal.SizeOf<NativeMethods.SHFILEINFO>(), flags);
+                hImg = NativeMethods.SHGetFileInfo(path, FileAttributes.Normal, out shinfo, (uint)Marshal.SizeOf(typeof(NativeMethods.SHFILEINFO)), flags);
 
                 if (hImg != IntPtr.Zero && shinfo.hIcon != IntPtr.Zero)
                 {

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 
 namespace Manina.Windows.Forms
 {
+    [ToolboxBitmap(typeof(DriveListBox))]
     public class DriveListBox : ListBox
     {
         #region Member Variables
