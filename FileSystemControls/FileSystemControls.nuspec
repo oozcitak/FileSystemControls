@@ -13,8 +13,5 @@
     <description>$description$</description>
     <copyright>$copyright$</copyright>
     <tags>winforms controls drive folder filesystem</tags>
-    <references>
-      <reference file="FileSystemControls.dll"></reference>
-    </references>
   </metadata>
 </package>
